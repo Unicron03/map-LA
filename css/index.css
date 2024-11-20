@@ -1,0 +1,170 @@
+
+@font-face {
+    font-family: "Hylia";
+    src:
+        url("../fonts/HyliaSerifBeta.otf") format("opentype")
+}
+
+html {
+    background-color: #434343;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #434343;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.subtitle {
+    font-family: Hylia, sans-serif;
+    font-weight: unset;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 10px 10px;
+    width: 360px;
+    background-color: rgba(0, 0, 0, .8);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, .6) !important;
+    color: white;
+    border-radius: 16px;
+    z-index: 1000;
+}
+
+.panel-flag {
+    padding: 8px;
+    border-bottom: 2px solid rgba(255, 255, 255, .2);
+}
+
+.panel-flag img {
+    height: 32px;
+    width: auto;
+    filter: invert(100%) brightness(100%);
+    cursor: pointer;
+}
+
+.panel-controls {
+    padding: 8px 3px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.panel-controls a {
+    background-color: #8585856b;
+    text-align: center;
+    width: -webkit-fill-available;
+    padding: 5px;
+    margin: 4px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.panel-flag img:hover, .panel-controls a:hover {
+    opacity: 0.7;
+}
+
+.panel-icons {
+    border-top: 2px solid rgba(255, 255, 255, .2);
+    display: inline-grid;
+    grid-template-columns: auto auto auto;
+    width: -webkit-fill-available;
+    margin-bottom: 14px;
+}
+
+.icon-panel {
+    display: inline-block;
+    text-align: -webkit-center;
+    user-select: none;
+    filter: brightness(100%);
+}
+
+.icon-panel img {
+    width: 82px;
+    margin: 14px auto 4px auto;
+    border-radius: 16px;
+    pointer-events: none;
+}
+
+.icon-panel p {
+    margin: 0;
+    font-size: smaller;
+    /* display: table-caption; */
+}
+
+#map {
+    background-color: #434343;
+    height: 1000px !important;
+}
+
+.map-container {
+    display: grid;
+    grid-template-columns: repeat(4, 256px); /* 7 colonnes */
+    grid-template-rows: repeat(4, 256px);    /* 5 lignes */
+    gap: 0px; /* Pas d'espace entre les tuiles */
+    width: fit-content;
+    margin: auto;
+    padding: 10px;
+    position: relative;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.map-part {
+    width: 256px;
+    height: 256px;
+    pointer-events: none;
+    user-select: none;
+}
+
+.marker {
+    position: absolute;
+    height: 24px;
+    /* pointer-events: none; */
+    transform-origin: bottom center;
+    transition: transform 0.2s ease;
+}
+.marker:hover {
+    opacity: 0.6;
+}
+
+.capsule-zoom {
+    position: absolute;
+    display: grid;
+    right: 0;
+    bottom: 0;
+    margin: 20px 20px;
+    transform: scale(1.3);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, .6) !important;
+    border-radius: 16px;
+    z-index: 1000;
+}
+
+.capsule-zoom a {
+    text-decoration: none;
+    color: white;
+    font-size: larger;
+    text-align: center;
+    font-weight: bold;
+    padding: 1px 7px;
+    background-color: rgba(0, 0, 0, .8);
+}
+
+/* ------MODIF LEAFLET------ */
+
+/* .leaflet-left {
+    left: unset;
+    right: 10px;
+    border-radius: 16px;
+}
+
+.leaflet-top {
+    top: unset;
+    bottom: 50px;
+} */
