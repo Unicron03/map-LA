@@ -1,12 +1,7 @@
 
 @font-face {
     font-family: "Hylia";
-    src:
-        url("../fonts/HyliaSerifBeta.otf") format("opentype")
-}
-
-html {
-    background-color: #434343;
+    src: url("../fonts/HyliaSerifBeta.otf") format("opentype");
 }
 
 body {
@@ -17,11 +12,22 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-.subtitle {
-    font-family: Hylia, sans-serif;
-    font-weight: unset;
-    margin-bottom: 10px;
-    text-align: center;
+#map {
+    background-color: #434343;
+    height: 1000px !important;
+}
+
+.map-container {
+    display: grid;
+    grid-template-columns: repeat(4, 256px); /* 4 columns */
+    grid-template-rows: repeat(4, 256px);    /* 4 rows */
+    gap: 0px; /* No space between tiles */
+    width: fit-content;
+    margin: auto;
+    padding: 10px;
+    position: relative;
+    user-select: none;
+    transition: transform 0.2s ease;
 }
 
 .panel {
@@ -30,6 +36,7 @@ body {
     top: 0;
     margin: 10px 10px;
     width: 360px;
+    height: 714px;
     background-color: rgba(0, 0, 0, .8);
     box-shadow: 0 16px 32px rgba(0, 0, 0, .6) !important;
     color: white;
@@ -42,12 +49,12 @@ body {
     border-bottom: 2px solid rgba(255, 255, 255, .2);
 }
 
-.panel-flag img {
-    height: 32px;
-    width: auto;
-    filter: invert(100%) brightness(100%);
-    cursor: pointer;
+.panel-flag-bandeau {
+    display: flex;
+    justify-content: space-between;
 }
+.panel-flag-bandeau button { background: none; border: none }
+.panel-flag img { height: 32px; width: auto; filter: invert(100%) brightness(100%); cursor: pointer; }
 
 .panel-controls {
     padding: 8px 3px;
@@ -70,6 +77,8 @@ body {
     opacity: 0.7;
 }
 
+/* ---------------------------------------- */
+
 .panel-icons {
     border-top: 2px solid rgba(255, 255, 255, .2);
     display: inline-grid;
@@ -79,10 +88,8 @@ body {
 }
 
 .icon-panel {
-    display: inline-block;
-    text-align: -webkit-center;
-    user-select: none;
-    filter: brightness(100%);
+    display: grid;
+    text-align: center;
 }
 
 .icon-panel img {
@@ -95,13 +102,32 @@ body {
 .icon-panel p {
     margin: 0;
     font-size: smaller;
-    /* display: table-caption; */
 }
 
-#map {
-    background-color: #434343;
-    height: 1000px !important;
+.subtitle {
+    font-family: Hylia, sans-serif;
+    font-weight: unset;
+    margin-bottom: 10px;
+    text-align: center;
 }
+
+.form-container { 
+    display: none; 
+}
+
+.form-container.active { 
+    display: block; 
+}
+
+#login-button { 
+    display: inline; 
+}
+
+#register-button { 
+    display: none; 
+}
+
+/* ---------------------------------------- */
 
 .map-container {
     display: grid;
@@ -130,6 +156,7 @@ body {
     transform-origin: bottom center;
     transition: transform 0.2s ease;
 }
+
 .marker:hover {
     opacity: 0.6;
 }
@@ -156,15 +183,109 @@ body {
     background-color: rgba(0, 0, 0, .8);
 }
 
-/* ------MODIF LEAFLET------ */
+/* --------------------------------------- */
 
-/* .leaflet-left {
-    left: unset;
-    right: 10px;
-    border-radius: 16px;
+#btnconnect {
+    /* height: 50px;
+    width: 300px;
+    background-color: #337AB7;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    font-size: medium;
+    margin-top: 90px; */
+
+    padding: 8px 3px;
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 2px solid rgba(255, 255, 255, .2);
 }
 
-.leaflet-top {
-    top: unset;
-    bottom: 50px;
-} */
+#login-form {
+    text-align: center;
+}
+
+#emailco {
+    position: absolute;
+    left: 25px;
+    top: 120px;
+    width: 300px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#passco {
+    position: absolute;
+    left: 25px;
+    top: 165px;
+    width: 300px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#register-button {
+    color: rgb(24, 81, 165);
+    border: none;
+    background-color: rgba(0, 0, 0, 0);
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+#register-button:hover {
+    color: rgb(11, 63, 139);
+    text-decoration: underline;
+}
+
+#usere {
+    position: absolute;
+    left: 25px;
+    top: 160px;
+    width: 300px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#passre {
+    position: absolute;
+    left: 25px;
+    top: 205px;
+    width: 300px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#fullre {
+    position: absolute;
+    left: 25px;
+    top: 250px;
+    width: 300px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#emailre {
+    position: absolute;
+    left: 25px;
+    top: 295px;
+    width: 300px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+#register-form {
+    text-align: center;
+}
+
+#registerbtn {
+    height: 50px;
+    width: 300px;
+    background-color: #337AB7;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    font-size: medium;
+    margin-top: 200px;
+    margin-bottom: 20px;
+}
+
+/* -------------- */
