@@ -17,6 +17,21 @@ body {
     height: 1000px !important;
 }
 
+#btn-popup-marker {
+    display: flex;
+    justify-content: space-around;
+}
+
+#info-popup-marker {
+    text-align: left;
+    font-size: medium;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px 0;
+} #info-popup-marker a:hover { text-decoration: underline !important; }
+
 .map-container {
     display: grid;
     grid-template-columns: repeat(4, 256px); /* 4 columns */
@@ -30,13 +45,27 @@ body {
     transition: transform 0.2s ease;
 }
 
+.popupMarker {
+    text-align: center;
+    max-width: 382px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.icon-template {
+    height: 32px;
+    width: auto;
+    cursor: pointer;
+}
+
 .panel {
     position: absolute;
     left: 0;
     top: 0;
     margin: 10px 10px;
     width: 360px;
-    height: 714px;
+    /* height: 714px; */
     background-color: rgba(0, 0, 0, .8);
     box-shadow: 0 16px 32px rgba(0, 0, 0, .6) !important;
     color: white;

@@ -153,9 +153,7 @@ include 'scripts/drawMarkers.php';
         });
 
         // Définition des limites avec des bords latéraux
-        var southWest = L.latLng(-77, -200); // coordonnées du coin inférieur gauche
-        var northEast = L.latLng(77, 200);   // coordonnées du coin supérieur droit
-        var bounds = L.latLngBounds(southWest, northEast);
+
 
         // Ajout de la couche de tuiles
         L.tileLayer("http://localhost:8000/imgUp/{z}/{x}/{y}.png", {
@@ -177,37 +175,27 @@ include 'scripts/drawMarkers.php';
         var Dungeons = L.icon({iconUrl: 'img/markers/dungeon.png', iconSize: [32, 32]});
 
         function addMarkersToMap(x, y, iconUrl, popupContent) {
+            // y+1 sur la SQL par rapport au local
             L.marker([-y, x], { icon: iconUrl })
             .bindPopup(popupContent)  // Affiche le HTML complet
             .addTo(map);
         }
 
-        // 423 240
         // addMarkersToMap(-30, -68, Dungeons, "Wind Fish's Egg")
-        // addMarkersToMap(-162, -65, Dungeons, "Piece of Heart")
-        // 51 255
+    </script>
 
+    <script>
+        function adjustPanelHeight() {
+            if (document.querySelector('.panel-icons').style.display == 'none') {
+                document.querySelector('.panel-icons').style.display = 'inline-grid';
+            } else {
+                document.querySelector('.panel-icons').style.display = 'none';
+            }
+        }
     </script>
 
     <?php drawMarkers($pdo); ?>
 </body>
 </html>
 
-
-
-<!-- Trouver la fameuse fonction  -->
-<!-- L.marker([3.02,1.666], {icon: Dungeons}).bindPopup("Wind Fish's Egg").addTo(map);  <=> 423,240  -->
-<!-- L.marker([2.84,1.8555], {icon: POHeart}).bindPopup("Piece of Heart").addTo(map); <=> 473,310 -->
-<!-- x/140,y/144 -->
-<!-- x/148,y/167 -->
-
-<!-- (423-10) / 3.02 = 136.7 -->
-<!-- (240-235) / 1.666 = 3 -->
-<!-- 50 c'est a gauche 70 c'est plus a droite -->
-<!-- 240 en haut 255 c'est plus bas --> 
-
-
-
-
-<!-- marqueur.titre -->
-<!-- marqueur.typeMarker -->
+<!-- NE PAS OUBLIER DE LANCER SERVEUR PYTHON python -m http.server -->
