@@ -146,14 +146,14 @@ include 'scripts/drawMarkers.php';
     <div id="map"></div>
     
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="scripts/createMarker.js"></script>
     <script>
+        var Perso = L.icon({iconUrl: 'img/markers/perso.png', iconSize: [32, 32]});
+
         var map = L.map('map', {
             zoomSnap: 1, // Zoom par paliers entiers
             zoomDelta: 1 // Contrôle la vitesse du zoom (facultatif)
         });
-
-        // Définition des limites avec des bords latéraux
-
 
         // Ajout de la couche de tuiles
         L.tileLayer("http://localhost:8000/imgUp/{z}/{x}/{y}.png", {
@@ -166,22 +166,37 @@ include 'scripts/drawMarkers.php';
         // Centrer la vue de la carte
         map.setView([0, 0], 2);
 
-        // Appliquer les limites à la carte
-        map.setMaxBounds(bounds);
-        map.on('drag', function() {
-            map.panInsideBounds(bounds, { animate: false });
+        // Bornes de la map
+        var southWest = L.latLng(-70.5, -180); // Coin en bas à gauche
+        var northEast = L.latLng(70.5, 180);   // Coin en haut à droite
+        var bounds = L.latLngBounds(southWest, northEast);
+
+        map.on('click', function(e) {
+            if (bounds.contains(e.latlng)) {
+                var coords = e.latlng;
+                var formContent = `
+                    <form onsubmit="createMarker(event, ${coords.lng}, ${-coords.lat}, this);">
+                        <label for="markerTitle">Titre :</label><br>
+                        <input type="text" id="markerTitle" name="title" required minlength="4" maxlength="20" size="15"><br><br>
+                        <label for="markerDescription">Description :</label><br>
+                        <textarea id="markerDescription" name="description" rows="3" cols="20"></textarea><br><br>
+                        <button type="submit">Créer le marqueur</button>
+                    </form>
+                `;
+
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(formContent)
+                    .openOn(map);
+            }
         });
 
-        var Dungeons = L.icon({iconUrl: 'img/markers/dungeon.png', iconSize: [32, 32]});
-
-        function addMarkersToMap(x, y, iconUrl, popupContent) {
+        function addMarkersToMap(x, y, titre, iconUrl, popupContent) {
             // y+1 sur la SQL par rapport au local
-            L.marker([-y, x], { icon: iconUrl })
-            .bindPopup(popupContent)  // Affiche le HTML complet
-            .addTo(map);
+            L.marker([-y, x], { icon: iconUrl, title: titre })
+                .bindPopup(popupContent)
+                .addTo(map);
         }
-
-        // addMarkersToMap(-30, -68, Dungeons, "Wind Fish's Egg")
     </script>
 
     <script>

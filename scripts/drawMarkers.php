@@ -1,4 +1,5 @@
 <?php
+
 function drawMarkers($pdo) {
     try {
         // Requête pour récupérer les marqueurs avec leurs images
@@ -52,7 +53,7 @@ function drawMarkers($pdo) {
                     </div>
                 </div>`;
 
-                addMarkersToMap($x, $y, customIconCat, popupContent);
+                addMarkersToMap($x, $y, '$titre', customIconCat, popupContent);
             ";
         }
         echo "</script>";
