@@ -14,7 +14,7 @@ function createMarker(event, x, y, form) {
     var description = form.elements['description'].value
 
     // Construction dynamique du contenu du popup
-    var popupContent = `<div class='popupMarker'>
+    var popupContent = `<div class='popupMarker' style='min-width: 280px !important;'>
         <h1 class='subtitle' style='margin: 0;'>${titre}</h1>
         <div id='info-popup-marker' ${!description ? "style='display: none;'" : ""}>
             ${description ? `<p>${description}</p>` : ""}
@@ -28,6 +28,9 @@ function createMarker(event, x, y, form) {
             </button>
             <button>
                 <img class='icon-template' src='./img/icon-mark.png' title='Mark as Complete' alt='icon-mark'/>
+            </button>
+            <button onclick="openEditForm('${titre}', '${description}', ${x}, ${y}, this)">
+                <img class='icon-template' src='./img/icon-modif.png' title='Modify the Marker' alt='icon-modif'/>
             </button>
         </div>
     </div>`;

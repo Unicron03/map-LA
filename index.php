@@ -175,7 +175,7 @@ include 'scripts/drawMarkers.php';
             if (bounds.contains(e.latlng)) {
                 var coords = e.latlng;
                 var formContent = `
-                    <form onsubmit="createMarker(event, ${coords.lng}, ${-coords.lat}, this);">
+                    <form class="form-marker" onsubmit="createMarker(event, ${coords.lng}, ${-coords.lat}, this);">
                         <label for="markerTitle">Titre :</label><br>
                         <input type="text" id="markerTitle" name="title" required minlength="4" maxlength="20" size="15"><br><br>
                         <label for="markerDescription">Description :</label><br>
@@ -190,6 +190,48 @@ include 'scripts/drawMarkers.php';
                     .openOn(map);
             }
         });
+
+        function openEditForm(titre, description, x, y, buttonElement) {
+            var editFormContent = `
+                <form class="form-marker" onsubmit="updateMarker(event, ${x}, ${y}, this);">
+                    <label for="editMarkerTitle">Titre :</label><br>
+                    <input type="text" id="editMarkerTitle" name="title" value="${titre}" required minlength="4" maxlength="20" size="15"><br><br>
+                    <label for="editMarkerDescription">Description :</label><br>
+                    <textarea id="editMarkerDescription" name="description" rows="3" cols="20">${description}</textarea><br><br>
+                    <button type="submit">Valider</button>
+                    <button type="button" onclick="deleteMarker(${x}, ${y})" style="background-color: red; color: white;">Supprimer</button>
+                </form>
+            `;
+
+            L.popup()
+                .setLatLng([-y+10.5, x])
+                .setContent(editFormContent)
+                .openOn(map);
+        }
+
+        function updateMarker(event, x, y, form) {
+            event.preventDefault();  // Empêche le rechargement de la page
+
+            var newTitle = form.elements['title'].value;
+            var newDescription = form.elements['description'].value;
+
+            // Création de l'icône personnalisée
+            var persoIcon = L.icon({
+                iconUrl: 'img/markers/perso.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            }); 
+
+            var updatedPopupContent = `<div class='popupMarker' style='min-width: 280px !important;'>
+                <h1 class='subtitle' style='margin: 0;'>${newTitle}</h1>
+                <div id='info-popup-marker' ${!newDescription ? "style='display: none;'" : ""}>
+                    ${newDescription ? `<p>${newDescription}</p>` : ""}
+                </div>
+            </div>`;
+
+            map.closePopup();  // Ferme le popup de modification après validation
+        }
 
         function addMarkersToMap(x, y, titre, iconUrl, popupContent) {
             // y+1 sur la SQL par rapport au local

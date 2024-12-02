@@ -60,6 +60,13 @@ body {
     cursor: pointer;
 }
 
+.form-marker {
+    font-size: medium;
+    font-weight: bold;
+}
+.form-marker input textarea { border-radius: 5px; border: 1px solid rgb(0 0 0); }
+.form-marker button { font-size: medium; }
+
 .panel {
     position: absolute;
     left: 0;
