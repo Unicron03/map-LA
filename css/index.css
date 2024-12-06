@@ -223,41 +223,35 @@ body {
 /* --------------------------------------- */
 
 #btnconnect {
-    /* height: 50px;
+    height: 50px;
     width: 300px;
     background-color: #337AB7;
     border-radius: 10px;
     text-align: center;
     color: white;
     font-size: medium;
-    margin-top: 90px; */
 
-    padding: 8px 3px;
+    /* padding: 8px 3px;
     display: flex;
     flex-wrap: wrap;
-    border-bottom: 2px solid rgba(255, 255, 255, .2);
+    border-bottom: 2px solid rgba(255, 255, 255, .2); */
+}
+
+#formconnex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+#formconnex input {
+    width: 300px;
+    height: 40px;
+    border-radius: 5px;
 }
 
 #login-form {
     text-align: center;
-}
-
-#emailco {
-    position: absolute;
-    left: 25px;
-    top: 120px;
-    width: 300px;
-    height: 25px;
-    border-radius: 5px;
-}
-
-#passco {
-    position: absolute;
-    left: 25px;
-    top: 165px;
-    width: 300px;
-    height: 25px;
-    border-radius: 5px;
 }
 
 #register-button {
@@ -273,39 +267,17 @@ body {
     text-decoration: underline;
 }
 
-#usere {
-    position: absolute;
-    left: 25px;
-    top: 160px;
-    width: 300px;
-    height: 25px;
-    border-radius: 5px;
+
+#forminsc {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
 }
 
-#passre {
-    position: absolute;
-    left: 25px;
-    top: 205px;
+#forminsc input{
     width: 300px;
-    height: 25px;
-    border-radius: 5px;
-}
-
-#fullre {
-    position: absolute;
-    left: 25px;
-    top: 250px;
-    width: 300px;
-    height: 25px;
-    border-radius: 5px;
-}
-
-#emailre {
-    position: absolute;
-    left: 25px;
-    top: 295px;
-    width: 300px;
-    height: 25px;
+    height: 40px;
     border-radius: 5px;
 }
 
@@ -321,7 +293,6 @@ body {
     text-align: center;
     color: white;
     font-size: medium;
-    margin-top: 200px;
     margin-bottom: 20px;
 }
 

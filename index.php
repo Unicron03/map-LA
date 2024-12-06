@@ -4,66 +4,16 @@ session_start();
 // ---------------------Connexion à la base de données-----------------------------------------------------------------
 $pdo = new PDO("mysql:host=localhost;dbname=map-LA", "root", "");
 
-
 // ---------------------Fonction pour vérifier qu'on est connecter ----------------------------------------------------(To check)
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-// ----------------------Inscription-----------------------------------------------------------------------------------
-if (isset($_POST['register'])) {
-    // ----------------------- Encaptulation des données entrez par l'utilisateur--------------------------------------
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $fullname = $_POST['fullname'];
-
-    // ---------------------Cryptage du mot de passe-------------------------------------------------------------------
-    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
-
-    $stmt = $pdo->prepare("INSERT INTO users (username, password, email, fullname) VALUES (?, ?, ?, ?)");
-    if ($stmt->execute([$username, $password, $email, $fullname])) {
-        echo "<p id='success-message'>Inscription réussie ! Veuillez vous connecter.</p>";
-
-        // --------------------Revenir au formulaire de Connection-------------------------------------------------------
-        echo "<script>document.addEventListener('DOMContentLoaded', function() { toggleForm('login-form'); });</script>"; 
-    } else {
-        echo "<p>Erreur lors de l'inscription. Veuillez réessayer.</p>";
-    }
-    
-}
-
-//-------------------------Connexion------------------------------------------------------------------------------------
-if (isset($_POST['login'])) {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-
-    //---------------------Récupèration des données de l'adresse email entrez par l'utilisateur--------------------------
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
-
-    //--------------------Vérification que le mot de passe entrez par l'utilisateur est le bon---------------------------
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-
-        //----------------------Charger checkPoints cochés par l'utilisateur---------------------------------------------(To Check)
-        //faire ici ou dans le html (surement plus dans le html)
-    } else {
-        echo "<p>Échec de la connexion. Veuillez vérifier vos identifiants.</p>";
-    }
-}
-
-// ------------------------Déconnexion-----------------------------------------------------------------------------------
-if (isset($_GET['logout'])) {
-    session_destroy();
-
-    //-------------------Voir que faire quand l'utilisateur se déconnect-------------------------------------------------(To Check)
-    header("Location: map.php");
-    exit;
-}
-
+include 'scripts/inscription.php';
+include 'scripts/connexion.php';
+include 'scripts/deconnexion.php';
 include 'scripts/drawMarkers.php';
+include 'scripts/createMarker.php';
 ?>
 
 <!DOCTYPE html>
@@ -72,7 +22,7 @@ include 'scripts/drawMarkers.php';
     <title>Carte Leaflet avec Tuiles d'Images</title>
 
     <link rel="stylesheet" href="css/leaflet.css" />
-    <link rel="stylesheet" href="css/index.css?v=2.2" >
+    <link rel="stylesheet" href="css/index.css?v=2.3" >
 
     <style>
         #map {
@@ -109,13 +59,14 @@ include 'scripts/drawMarkers.php';
             </div>
 
             <!-- ------------------Normalement se sera les différent type de check point --------------------------------------(To Check) -->
-            <div class="panel-controls">
-                <br><a>Cacher les points marqués</a>
-                <br><a onclick="disableAllMarkers()">Déselectionner toutes les catégories</a>
-                <br><a onclick="enableAllMarkers()">Sélectionner toutes les catégories</a>
-            </div>
-
-            <div class="panel-icons" id="panelIcons">
+            <div id="change">
+                <div class="panel-controls">
+                    <br><a>Cacher les points marqués</a>
+                    <br><a onclick="disableAllMarkers()">Déselectionner toutes les catégories</a>
+                    <br><a onclick="enableAllMarkers()">Sélectionner toutes les catégories</a>
+                </div>
+                <div class="panel-icons" id="panelIcons">
+                </div>
             </div>
 
             <!-- -----------------Formulaire connexion------------------------------------------------------------------------ -->
@@ -132,7 +83,7 @@ include 'scripts/drawMarkers.php';
             <!-- -----------------Formulaire inscription------------------------------------------------------------------------ -->
             <div id="register-form" class="form-container">
                 <h2>It's dangerous to go alone! We're glad you're here with us.</h2>
-                <form method="POST">
+                <form id="forminsc" method="POST">
                     <input id="usere" type="text" name="username" placeholder="Nom d'utilisateur" required>
                     <input id="passre" type="password" name="password" placeholder="Mot de passe" required>
                     <input id="fullre" type="text" name="fullname" placeholder="Nom complet" required>
@@ -146,7 +97,7 @@ include 'scripts/drawMarkers.php';
     <div id="map"></div>
     
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="scripts/createMarker.js"></script>
+
     <script>
         var Perso = L.icon({iconUrl: 'img/markers/perso.png', iconSize: [32, 32]});
 
@@ -171,7 +122,7 @@ include 'scripts/drawMarkers.php';
         var northEast = L.latLng(70.5, 180);   // Coin en haut à droite
         var bounds = L.latLngBounds(southWest, northEast);
 
-        map.on('click', function(e) {
+        map.on('contextmenu', function(e) {
             if (bounds.contains(e.latlng)) {
                 var coords = e.latlng;
                 var formContent = `
@@ -191,46 +142,22 @@ include 'scripts/drawMarkers.php';
             }
         });
 
-        function openEditForm(titre, description, x, y, buttonElement) {
+        function openEditForm(titre, description, x, y, id, buttonElement) {
             var editFormContent = `
-                <form class="form-marker" onsubmit="updateMarker(event, ${x}, ${y}, this);">
+                <form class="form-marker" onsubmit="updateMarker(event, ${id}, this);">
                     <label for="editMarkerTitle">Titre :</label><br>
                     <input type="text" id="editMarkerTitle" name="title" value="${titre}" required minlength="4" maxlength="20" size="15"><br><br>
                     <label for="editMarkerDescription">Description :</label><br>
                     <textarea id="editMarkerDescription" name="description" rows="3" cols="20">${description}</textarea><br><br>
                     <button type="submit">Valider</button>
-                    <button type="button" onclick="deleteMarker(${x}, ${y})" style="background-color: red; color: white;">Supprimer</button>
+                    <button type="button" onclick="deleteMarker(event, ${id})" style="background-color: red; color: white;">Supprimer</button>
                 </form>
             `;
 
             L.popup()
-                .setLatLng([-y+10.5, x])
+                .setLatLng([-y+11.3, x])
                 .setContent(editFormContent)
                 .openOn(map);
-        }
-
-        function updateMarker(event, x, y, form) {
-            event.preventDefault();  // Empêche le rechargement de la page
-
-            var newTitle = form.elements['title'].value;
-            var newDescription = form.elements['description'].value;
-
-            // Création de l'icône personnalisée
-            var persoIcon = L.icon({
-                iconUrl: 'img/markers/perso.png',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                popupAnchor: [0, -32]
-            }); 
-
-            var updatedPopupContent = `<div class='popupMarker' style='min-width: 280px !important;'>
-                <h1 class='subtitle' style='margin: 0;'>${newTitle}</h1>
-                <div id='info-popup-marker' ${!newDescription ? "style='display: none;'" : ""}>
-                    ${newDescription ? `<p>${newDescription}</p>` : ""}
-                </div>
-            </div>`;
-
-            map.closePopup();  // Ferme le popup de modification après validation
         }
 
         function addMarkersToMap(x, y, titre, iconUrl, popupContent) {
@@ -251,7 +178,8 @@ include 'scripts/drawMarkers.php';
         }
     </script>
 
-    <?php drawMarkers($pdo); ?>
+    <?php drawMarkers(); ?>
+    <script src="./scripts/toggleForm.js"></script>
 </body>
 </html>
 
