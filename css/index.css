@@ -13,15 +13,17 @@ body {
 }
 
 #map {
+    height: 100% !important;
     background-color: #434343;
-    height: 1000px !important;
     cursor: default;
+    width: 100%;
 }
 
 #btn-popup-marker {
     display: flex;
     justify-content: space-around;
 }
+#btn-popup-marker button { height: 48px; }
 
 #info-popup-marker {
     text-align: left;
@@ -32,6 +34,16 @@ body {
     gap: 10px;
     margin: 10px 0;
 } #info-popup-marker a:hover { text-decoration: underline !important; }
+
+#leaflet-control-reset {
+    font-size: 22;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    text-decoration: none;
+    color: black;
+}
 
 .map-container {
     display: grid;
@@ -53,6 +65,7 @@ body {
     flex-direction: column;
     gap: 10px;
 }
+.popupMarker-button-checked { background-color: darkseagreen; }
 
 .icon-template {
     height: 32px;
@@ -60,20 +73,26 @@ body {
     cursor: pointer;
 }
 
-.form-marker {
+.form-marker button {
+    border-radius: 6px;
+    border: none;
     font-size: medium;
+    width: inherit;
+    background-color: #8585856b;
+    color: white;
+    padding: 7px;
+    margin: 4px;
+    cursor: pointer;
     font-weight: bold;
 }
-.form-marker input textarea { border-radius: 5px; border: 1px solid rgb(0 0 0); }
-.form-marker button { font-size: medium; }
+.form-marker button:hover { opacity: 0.7; }
 
 .panel {
     position: absolute;
     left: 0;
     top: 0;
     margin: 10px 10px;
-    width: 360px;
-    /* height: 714px; */
+    width: 375px;
     background-color: rgba(0, 0, 0, .8);
     box-shadow: 0 16px 32px rgba(0, 0, 0, .6) !important;
     color: white;
@@ -91,7 +110,7 @@ body {
     justify-content: space-between;
 }
 .panel-flag-bandeau button { background: none; border: none }
-.panel-flag img { height: 32px; width: auto; filter: invert(100%) brightness(100%); cursor: pointer; }
+.panel-flag img { height: 32px; width: auto; filter: invert(100%); cursor: pointer; }
 
 .panel-controls {
     padding: 8px 3px;
@@ -100,6 +119,11 @@ body {
 }
 
 .panel-controls a {
+    font-size: unset;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-decoration: none;
+    border: none;
+    color: white;
     background-color: #8585856b;
     text-align: center;
     width: -webkit-fill-available;
@@ -116,30 +140,59 @@ body {
 
 /* ---------------------------------------- */
 
-.panel-icons {
-    border-top: 2px solid rgba(255, 255, 255, .2);
-    display: inline-grid;
-    grid-template-columns: auto auto auto;
-    width: -webkit-fill-available;
-    margin-bottom: 14px;
+#panel-icons {
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    height: calc(100vh - 336px); /* Ajuste la hauteur dynamique */
+    max-height: 620px;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.icon-panel {
-    display: grid;
+
+.panel-icons-element {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: fit-content;
+    width: 96px;
+    margin: 10px;
+    gap: 3px;
+    cursor: pointer;
+}
+.panel-icons-element img { height: 84px; width: auto; }
+.panel-icons-element span {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+.panel-icons-element:hover { opacity: 0.6; }
+
+.panel-icons-element-active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: fit-content;
+    width: 96px;
+    margin: 10px;
+    gap: 3px;
+    cursor: pointer;
+}
+.panel-icons-element-active img { height: 84px; width: auto; }
+.panel-icons-element-active span {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     text-align: center;
 }
 
-.icon-panel img {
-    width: 82px;
-    margin: 14px auto 4px auto;
-    border-radius: 16px;
-    pointer-events: none;
-}
-
-.icon-panel p {
-    margin: 0;
-    font-size: smaller;
-}
+.scrollable-panel { scrollbar-color: rgba(255, 255, 255, 0.2) transparent; }
 
 .subtitle {
     font-family: Hylia, sans-serif;
@@ -158,10 +211,6 @@ body {
 
 #login-button { 
     display: inline; 
-}
-
-#register-button { 
-    display: none; 
 }
 
 /* ---------------------------------------- */
@@ -252,7 +301,9 @@ body {
 
 #login-form {
     text-align: center;
+    display: none;
 }
+#login-form button { cursor: pointer; }
 
 #register-button {
     color: rgb(24, 81, 165);
@@ -283,6 +334,7 @@ body {
 
 #register-form {
     text-align: center;
+    margin: 10px;
 }
 
 #registerbtn {

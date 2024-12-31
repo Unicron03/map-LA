@@ -1,39 +1,29 @@
 let currentForm = null;
 
 function toggleForm(formId) {
-    // ---------------------------Initialisation des éléments à modifier-----------------------------------------
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
-    const changeDiv = document.getElementById('change');
-    const registerButton = document.getElementById('register-button');
-    const loginButton = document.getElementById('login-button');
-    const successMessage = document.getElementById('success-message'); // Sélectionnez le message de succès
+    const panelControls = document.getElementById('panel-controls');
+    const panelIcons = document.getElementById('panel-icons');
 
-    if (successMessage) {
-        successMessage.remove(); // Effacez le message d'inscription réussie
-    }
-
-    if (currentForm === formId) {
+    if (currentForm == formId || registerForm.style.display == "block") {
         // Si on clique sur le même bouton, on remet le contenu initial
-        loginForm.classList.remove('active');
-        registerForm.classList.remove('active');
-        // -----------------------------Ce reécrit les divs supprimer regarder si je peux pas mieux obtimiser-------------(To Check)
-        changeDiv.innerHTML = "<div class='panel-controls'><br><a>Cacher les points marqués</a><br><a>Déselectionner toutes les catégories</a><br><a>Sélectionner toutes les catégories</a></div>";
-        currentForm = null;
-        loginButton.style.display = 'inline';
-        registerButton.style.display = 'none'; // Cacher le bouton inscription
-    } else {
-        // Afficher le formulaire correspondant
-        loginForm.classList.remove('active');
-        registerForm.classList.remove('active');
-        document.getElementById(formId).classList.add('active');
-        changeDiv.innerHTML = ''; // Vider le contenu initial
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'none';
+        panelControls.style.display = 'flex';
+        panelIcons.style.display = 'flex';
 
-        if (formId === 'register-form') {
-            registerButton.style.display = 'none'; // Cacher le bouton inscription pendant l'inscription
+        currentForm = null;
+    } else {
+        if (formId == "login-form") {
+            loginForm.style.display = 'block';
         } else {
-            registerButton.style.display = 'inline'; // Montrer le bouton inscription uniquement avec le formulaire de connexion
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
         }
+        
+        panelControls.style.display = 'none';
+        panelIcons.style.display = 'none';
         
         currentForm = formId;
     }

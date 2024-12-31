@@ -1,54 +1,77 @@
 <?php
+$class = isset($_SESSION['class']) ? $_SESSION['class'] : 'panel-icons-element';
+
+function isCatEnable($catName) {
+    return in_array($catName, $_SESSION['categories']);
+}
+
 function loadCatMarkers() {
     try {
-        $pdo = new PDO("mysql:host=localhost;dbname=map-LA", "root", "");
+        $pdo = Database::get();
 
-        // Requête pour récupérer les catMarkers avec leurs images
-        $stmt = $pdo->query("SELECT m.id, m.subId, m.nom, m.image
-                            FROM typemarker m");
+        $stmt = $pdo->query("SELECT m.id, m.subId, m.nom, m.image FROM typemarker m");
         $catMarkers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Génération du script JavaScript pour chaque catMarker
         echo "<script>";
+        echo "let panelIcons = document.getElementById('panel-icons');";
         foreach ($catMarkers as $catMarker) {
             $id = $catMarker['id'];
-            $subID = $catMarker['subId'];
-            $nom = addslashes($catMarker['nom']);
 
-            // Gérer l'image de la catégorie
+            if (!isLoggedIn() && $id >= 16) {
+                break;
+            }
+
+            $nom = addslashes($catMarker['nom']);
+            $subID = $catMarker['subId'];
             $iconBase64 = 'data:image/png;base64,' . base64_encode($catMarker['image']);
 
-            // JavaScript pour ajouter le catMarker à la carte
-            echo "
-                var popupContent = `<div class='popupMarker' " . ($typeId == 16 ? "style='min-width: 280px !important;'" : "") . ">
-                    <h1 class='subtitle' style='margin: 0;'>$titre</h1>
-                    " . (!empty($popupImage) ? "<img src='$popupImage' style='width: auto; max-width: 382px; height: auto;'>" : "") . "
-                    <div id='info-popup-marker' " . (empty($description) && empty($sourceLink) ? "style='display: none;'" : "") . ">
-                        " . (!empty($description) ? "<p>$description</p>" : "") . "
-                        " . (!empty($sourceLink) ? "<p>Source: <a href='$sourceLink' target='blank'>$nomCat Guide</a></p>" : "") . "
-                    </div>
-                    <div id='btn-popup-marker'>
-                        <button>
-                            <img class='icon-template' src='./img/icon-globe.png' title='Go to Source' alt='icon-globe'/>
-                        </button>
-                        <button>
-                            <img class='icon-template' src='./img/icon-favorite.png' title='Mark as Favorite' alt='icon-favorite'/>
-                        </button>
-                        <button>
-                            <img class='icon-template' src='./img/icon-mark.png' title='Mark as Complete' alt='icon-mark'/>
-                        </button>
-                        " . ($typeId == 16 ? "<button onclick=\"openEditForm('$titre', '$description', $x, $y, $id, this)\">
-                            <img class='icon-template' src='./img/icon-modif.png' title='Modify the Marker' alt='icon-modif'/>
-                        </button>" : "") . "
-                    </div>
-                </div>`;
+            if (!in_array($nom, $_SESSION['categoriesMother'])) {
+                $_SESSION['categoriesMother'][] = $catMarker['nom'];
+            }
 
-                addMarkersToMap($x, $y, '$titre', customIconCat, popupContent);
+            $catStatus = isCatEnable($nom);
+            $opacityStyle = $catStatus ? "opacity: 0.4;" : "1";
+        
+            echo "
+                (() => {
+                    let element = document.createElement('form');
+                    element.className = 'panel-icons-element';
+                    element.id = '$nom';
+                    element.style = '$opacityStyle';
+                    
+                    element.method = 'post';
+                    element.action = '" . $_SERVER['PHP_SELF'] . "';
+                    
+                    let hiddenInput = document.createElement('input');
+                    
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'param';
+                    hiddenInput.value = '$nom';
+                    
+                    let img = document.createElement('img');
+                    img.src = '$iconBase64';
+                    img.title = '$nom';
+                    
+                    let span = document.createElement('span');
+                    span.textContent = '$nom';
+                    
+                    element.appendChild(hiddenInput);
+                    element.appendChild(img);
+                    element.appendChild(span);
+                    
+                    element.addEventListener('click', () => {
+                        element.submit();
+                    });
+                    
+                    panelIcons.appendChild(element);
+                })();
             ";
-        }
+        }        
         echo "</script>";
     } catch (PDOException $e) {
-        echo "Erreur : " . $e->getMessage();
+        echo "<script>console.error('Erreur : " . $e->getMessage() . "');</script>";
     }
 }
 ?>
+
+<!-- $_SESSION['class'] = $_SESSION['class'] == 'panel-icons-element' ? 'panel-icons-element-active' : 'panel-icons-element'; -->

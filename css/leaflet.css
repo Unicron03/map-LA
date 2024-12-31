@@ -130,13 +130,11 @@
 	position: absolute;
 	z-index: 1000;
 	pointer-events: none;
-	bottom: 45px;
-	}
-.leaflet-top {
-	bottom: 60px;
+	bottom: 0;
 	}
 .leaflet-left {
-	right: 15px;
+	right: 10px;
+    bottom: 10px;
 	}
 .leaflet-control {
 	float: left;
@@ -256,6 +254,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 /* general typography */
 .leaflet-container {
+	z-index: 1;
 	font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
 	}
 
