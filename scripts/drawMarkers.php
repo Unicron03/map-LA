@@ -22,33 +22,39 @@ function isCatAGroup($pdo, $category) {
 function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
     $parCat = isCatAGroup($pdo, $category);
 
+    // Requête SQL mise à jour pour inclure la table userdata
     $query = "
-        SELECT m.id, m.x, m.y, m.titre, m.description, m.image, m.favorite, m.complete, m.source, m.userID,
+        SELECT 
+            m.id, m.x, m.y, m.titre, m.description, m.image, 
+            COALESCE(u.favorite, m.favorite) AS favorite, 
+            COALESCE(u.complete, m.complete) AS complete, 
+            m.source, m.userID,
             t.image AS imgCat, t.nom AS nomCat, t.id AS typeId, t.subId
         FROM marker m
         JOIN typemarker t ON m.typeMarker = t.id
+        LEFT JOIN userdata u ON u.idMarker = m.id AND u.userId = :userId
         WHERE (m.userID = :userId OR m.userID IS NULL)
     ";
 
-    // Si la catégorie est une catégorie mère
+    // Filtrer par catégorie (catégorie mère ou sous-catégorie)
     if (!$parCat[0]['subId']) {
         $query .= " AND t.subId = :id";
     } else {
         $query .= " AND t.nom LIKE :category";
     }
 
-    // Ajout des conditions de filtrage si nécessaires
+    // Ajout des conditions de filtrage si nécessaire
     if ($complete == false) {
-        $query .= " AND m.complete = :complete";
+        $query .= " AND COALESCE(u.complete, m.complete) = :complete";
     }
     if ($favorite == false) {
-        $query .= " AND m.favorite = :favorite";
+        $query .= " AND COALESCE(u.favorite, m.favorite) = :favorite";
     }
 
-    // Préparation, paramètrage et exécution de la requête
+    // Préparation de la requête
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
-    
+
     if (!$parCat[0]['subId']) {
         $stmt->bindValue(':id', $parCat[0]['id'], PDO::PARAM_STR);
     } else {
@@ -62,8 +68,9 @@ function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
         $stmt->bindValue(':favorite', $favorite, PDO::PARAM_STR);
     }
 
+    // Exécution et récupération des résultats
     $stmt->execute();
-    return $stmt->fetchAll();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**
@@ -120,13 +127,20 @@ function generateMarkerScript($marker) {
                     </button>
                 </a>" : "") . "
                 <form onsubmit='markAsFavorite(event, $id);'>
-                    <button " . ($favorite == 1 ? "class='popupMarker-button-checked'" : "") . ">
-                        <img class='icon-template' src='./img/icon-favorite.png' title='Mark as Favorite'/>
+                    <button " . ($favorite == 1 ? "class='popupMarker-button-checked'" : "") . (isLoggedIn() ? "" : "disabled") . ">
+                        <img class='icon-template' 
+                            src='./img/icon-favorite.png' 
+                            title='" . (isLoggedIn() ? "Mark as Favorite" : "Log in to use this feature") . "'
+                        />
                     </button>
                 </form>
                 <form onsubmit='markAsComplete(event, $id);'>
-                    <button " . ($complete == 1 ? "class='popupMarker-button-checked'" : "") . ">
-                        <img class='icon-template' src='./img/icon-mark.png' title='Mark as Complete'/>
+                    <button 
+                        " . ($complete == 1 ? "class='popupMarker-button-checked'" : "") . (isLoggedIn() ? "" : "disabled") . ">
+                        <img class='icon-template' 
+                            src='./img/icon-mark.png' 
+                            title='" . (isLoggedIn() ? "Mark as Complete" : "Log in to use this feature") . "'
+                        />
                     </button>
                 </form>
                 " . ($typeId == 16 ? "<button onclick=\"openEditForm('$titre', '$description', $x, $y, $id, this)\">

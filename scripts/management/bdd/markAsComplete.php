@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: application/json');  // Retour JSON
+session_start();
 
 try {
     // Connexion à la base de données
@@ -8,23 +8,28 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
 
-    // Récupération des données JSON
-    $data = json_decode(file_get_contents('php://input'), true);
-
-    if (!isset($data['id']) || empty($data['id'])) {
-        echo json_encode(['success' => false, 'error' => 'ID manquant']);
-        exit();
+    // Vérification de l'ID passé en paramètre POST
+    if (!isset($_POST['id']) || empty($_POST['id'])) {
+        die('ID manquant'); // Si l'ID est absent, afficher un message d'erreur simple.
     }
 
-    $id = $data['id'];
+    $id = $_POST['id'];
 
     // Préparer et exécuter la requête
-    $stmt = $pdo->prepare("UPDATE marker SET complete = NOT complete WHERE id = :id");
-    if ($stmt->execute([':id' => $id])) {
-        echo json_encode(['success' => true]);
+    $stmt = $pdo->prepare("SELECT typeMarker FROM marker WHERE id = ?");
+    $stmt->execute([$id]);
+    $markerTypeId = $stmt->fetch(PDO::FETCH_ASSOC); // Récupère directement une ligne
+
+    if ($markerTypeId['typeMarker'] == 16) {
+        $stmt = $pdo->prepare("UPDATE marker SET complete = NOT complete WHERE id = ?");
+        $stmt->execute([$id]);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Erreur lors du marquage en favori']);
+        $stmt = $pdo->prepare("UPDATE userdata SET complete = NOT complete WHERE idMarker = ? AND userId = ?");
+        $stmt->execute([$id, $_SESSION['user_id']]);
     }
+
+    // Terminer simplement l'exécution après la mise à jour
+    exit();
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    die('Erreur SQL : ' . $e->getMessage()); // En cas d'erreur, afficher un message simple.
 }

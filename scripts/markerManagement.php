@@ -109,17 +109,12 @@ require_once 'scripts/drawMarkers.php';
         // Envoi des données au serveur via AJAX
         fetch('scripts/management/bdd/markAsComplete.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id })
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ id: id }) // Envoi des données en format x-www-form-urlencoded
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                map.closePopup();
-                location.reload();
-            } else {
-                alert("Erreur lors de la modification du marqueur.");
-            }
+        .then(() => {
+            map.closePopup();
+            location.reload();
         })
         .catch(error => console.error('Erreur:', error));
     }
