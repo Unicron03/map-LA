@@ -1,3 +1,13 @@
+<style>
+   body {
+       background-color: #17202f;
+   }
+
+   .markdown-body pre {
+      background-color: #f6f8fa26 !important;
+   }
+</style>
+
 # SAE - Carte interactive jeu vidéo : <u>Zelda: Link's Awakening</u>
 
 ## Lien direct
@@ -6,7 +16,7 @@ Vous pouvez accéder à l'application via le lien suivant : [http://unicron-la.g
 Vous pouvez aussi faire tourner le projet en local (voir ci-après [Prérequis & Éxécution](#prérequis)).
 
 ## Fonctionnement
-<u>**Zelda: Link's Awakening**</u> est une carte interactive contenant des *markers* (des points d'intérêt du jeu). Vous pouvez alors **sélectionner un *marker* pour obtenir des informations sur ce dernier**.  
+**<u>Zelda: Link's Awakening</u>** est une carte interactive contenant des *markers* (des points d'intérêt du jeu). Vous pouvez alors **sélectionner un *marker* pour obtenir des informations sur ce dernier**.  
 ![alt text](img/readme-img/image.png)
 
 Pour naviguer sur cette carte, vous pouvez :
