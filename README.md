@@ -1,7 +1,7 @@
 # SAE - Carte interactive jeu vidéo : <u>Zelda: Link's Awakening</u>
 
 ## Lien direct
-Vous pouvez accéder à l'application via le lien suivant : http://unicron-la.great-site.net/  
+Vous pouvez accéder à l'application via le lien suivant : [http://unicron-la.great-site.net/](http://unicron-la.great-site.net/)  
 **OU**  
 Vous pouvez aussi faire tourner le projet en local (voir ci-après [Prérequis & Éxécution](#prérequis)).
 
@@ -26,14 +26,14 @@ Ce panneau vous permet également de vous connecter/inscrire à l'application qu
 ## Prérequis
 Pour exécuter l'application, vous aurez besoin de :
 1. **Télécharger le projet**. Vous avez alors deux choix possible à savoir :
-   - Vous rendre sur https://github.com/Unicron03/map-LA/ puis bouton "Code" puis bouton "Download ZIP" et enfin décompresser le projet ;  
+   - Vous rendre sur [https://github.com/Unicron03/map-LA/](https://github.com/Unicron03/map-LA/) puis bouton "Code" puis bouton "Download ZIP" et enfin décompresser le projet ;  
    **OU**
    - Via GitBash en clonant le projet à l'aide de la commande suivante :
    ```bash
    git clone https://github.com/Unicron03/map-LA.git
    ```
-2. **Télécharger, si besoin, un interpréteur PHP/MySQL** (Exemple XAMPP : https://www.apachefriends.org/download.html), y déposer le projet et charger dans PHPMyAdmin le fichier map-LA.sql en ayant préalablement créé une database "map-LA" ;
-3. **Télécharger, si besoin, un interpréteur Python** (Exemple Python 3.12 : https://apps.microsoft.com/detail/9NCVDN91XZQP?hl=neutral&gl=FR&ocid=pdpshare)
+2. **Télécharger, si besoin, un interpréteur PHP/MySQL** (Exemple XAMPP : [https://www.apachefriends.org/download.html](https://www.apachefriends.org/download.html)), y déposer le projet et charger dans PHPMyAdmin le fichier map-LA.sql en ayant préalablement créé une database "map-LA" ;
+3. **Télécharger, si besoin, un interpréteur Python** (Exemple Python 3.12 : [https://apps.microsoft.com/detail/9NCVDN91XZQP?hl=neutral&gl=FR&ocid=pdpshare](https://apps.microsoft.com/detail/9NCVDN91XZQP?hl=neutral&gl=FR&ocid=pdpshare))
 
 ## Exécution
 **Une fois tous les prérequis complétés** vous pourrez alors éxécuter l'application.  
@@ -43,12 +43,15 @@ Pour cela :
    python -m http.server
    ```
 2. **Lancer les serveurs** Apache et PHPMyAdmin (ou autres nécessaires)
-3. Ouvrez l'application web via le lien suivant : http://localhost/map-LA
+3. Ouvrez l'application web via le lien suivant : [http://localhost/map-LA](http://localhost/map-LA)
 
 ## Notes
 Vous pouvez tester d'utiliser un compte commun dont voici les identifiants de connexion :
-- Identifiant : account.example@gmail.com
+- Identifiant : <span style="color: #348aec;">account.example@gmail.com</span>
 - Mot de passe : ilovecats
 
+
 >Vous disposez également d'une version sans Leaflet, mais elle n'est pas recommandée (ne disposant pas des dernières fonctionnalités et n'étant pas une version stable). Elle est présente davantage à titre de maquette graphique que fonctionnelle.
->> Néanmoins, pour l'exécuter, il vous suffit de lancer le fichier `index.html` du répertoire 'ANCIENTVERSION'.
+>> Néanmoins, pour l'exécuter, il vous suffit de lancer le fichier <span style="color: #d1b57b;">`index.html`</span> du répertoire 'ANCIENTVERSION'.  
+**OU**  
+De vous rendre sur le lien suivant [https://unicron03.github.io/map-LA/ANCIENTVERSION/](https://unicron03.github.io/map-LA/ANCIENTVERSION/)
