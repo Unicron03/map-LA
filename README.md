@@ -1,10 +1,15 @@
 <style>
    body {
-       background-color: #17202f;
+      background-color: #17202f !important;
+      color: white !important;
    }
 
    .markdown-body pre {
       background-color: #f6f8fa26 !important;
+   }
+
+   .highlight {
+      background-color: unset !important;
    }
 </style>
 
