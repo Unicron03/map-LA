@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Renvoi l'id et le subId de la catégorie (pour évaluation si c'est un catégorie mère ou non)---
+*/
 function isCatAGroup($pdo, $category) {
     $query = "
         SELECT id, subId
@@ -15,7 +18,7 @@ function isCatAGroup($pdo, $category) {
 
 /**
  * Récupère les marqueurs depuis la base de données.
- */
+*/
 function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
     $parCat = isCatAGroup($pdo, $category);
 
@@ -34,27 +37,7 @@ function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
         $query .= " AND t.nom LIKE :category";
     }
 
-    // $parCat = isCatAGroup($pdo, $category);
-    // if (!$parCat[0]['subId']) {
-    //     $query = "
-    //         SELECT m.id, m.x, m.y, m.titre, m.description, m.image, m.favorite, m.complete, m.source, m.userID,
-    //             t.image AS imgCat, t.nom AS nomCat, t.id AS typeId, t.subId
-    //         FROM marker m
-    //         JOIN typemarker t ON m.typeMarker = t.id
-    //         WHERE (m.userID = :userId OR m.userID IS NULL)
-    //         AND t.subId = :id
-    //     ";
-    // }
-
-    // $query = "
-    //     SELECT m.id, m.x, m.y, m.titre, m.description, m.image, m.favorite, m.complete, m.source, m.userID,
-    //            t.image AS imgCat, t.nom AS nomCat, t.id AS typeId
-    //     FROM marker m
-    //     JOIN typemarker t ON m.typeMarker = t.id
-    //     WHERE (m.userID = :userId OR m.userID IS NULL)
-    //       AND t.nom LIKE :category
-    // ";
-
+    // Ajout des conditions de filtrage si nécessaires
     if ($complete == false) {
         $query .= " AND m.complete = :complete";
     }
@@ -62,6 +45,7 @@ function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
         $query .= " AND m.favorite = :favorite";
     }
 
+    // Préparation, paramètrage et exécution de la requête
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
     
@@ -84,7 +68,7 @@ function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
 
 /**
  * Génère et affiche les marqueurs sous forme de script JavaScript.
- */
+*/
 function renderMarkers($category = null, $complete = false, $favorite = false) {
     $pdo = Database::get();
     $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
@@ -99,15 +83,15 @@ function renderMarkers($category = null, $complete = false, $favorite = false) {
 
 /**
  * Génère le script JavaScript pour un marqueur.
- */
+*/
 function generateMarkerScript($marker) {
     $id = $marker['id'];
     $x = $marker['x'];
     $y = $marker['y'];
-    $titre = addslashes($marker['titre']);
-    $description = addslashes($marker['description']);
-    $sourceLink = addslashes($marker['source']);
-    $nomCat = addslashes($marker['nomCat']);
+    $titre = addslashes(strval($marker['titre']));
+    $description = addslashes(strval($marker['description']));
+    $sourceLink = addslashes(strval($marker['source']));
+    $nomCat = addslashes(strval($marker['nomCat']));
     $typeId = $marker['typeId'];
     $favorite = $marker['favorite'];
     $complete = $marker['complete'];

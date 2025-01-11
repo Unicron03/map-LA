@@ -15,12 +15,11 @@ if (isset($_POST['register'])) {
     //----------------------Insertion ---------------------------------------------------------------------------------
     $stmt = $pdo->prepare("INSERT INTO users (username, password, email, fullname) VALUES (?, ?, ?, ?)");
     if ($stmt->execute([$username, $password, $email, $fullname])) {
-        echo "<p id='success-message'>Inscription réussie ! Veuillez vous connecter.</p>";
+        echo "<script>alert('Successful registration! Please log in.');</script>";
 
         // --------------------Revenir au formulaire de Connection-------------------------------------------------------
         echo "<script>document.addEventListener('DOMContentLoaded', function() { toggleForm('login-form'); });</script>"; 
     } else {
-        echo "<p>Erreur lors de l'inscription. Veuillez réessayer.</p>";
+        echo "<script>alert('Registration error. Please try again.');</script>";
     }
-    
 }

@@ -1,10 +1,16 @@
 <?php
 $class = isset($_SESSION['class']) ? $_SESSION['class'] : 'panel-icons-element';
 
+/**
+ * Renvoi si une catégorie donné est affiché ou non
+*/
 function isCatEnable($catName) {
     return in_array($catName, $_SESSION['categories']);
 }
 
+/**
+ * Renvoi les catégories sous forme JSON (pour le panel dédié)
+*/
 function loadCatMarkers() {
     try {
         $pdo = Database::get();

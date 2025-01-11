@@ -1,4 +1,5 @@
 <?php
+// Récupération de la connexion à la bdd
 $pdo = Database::get();
 
 //-------------------------Connexion------------------------------------------------------------------------------------
@@ -15,11 +16,8 @@ if (isset($_POST['login'])) {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-
-        //----------------------Charger checkPoints cochés par l'utilisateur---------------------------------------------(To Check)
-        //faire ici ou dans le html (sûrement plus dans le html)
     } else {
-        // Générer un popup en cas d'échec
-        echo "<script>alert('Échec de la connexion. Veuillez vérifier vos identifiants.');</script>";
+        // Cas d'erreur
+        echo "<script>alert('Connection failed. Please check your login details.');</script>";
     }
 }

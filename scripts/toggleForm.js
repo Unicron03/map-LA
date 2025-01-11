@@ -1,5 +1,8 @@
 let currentForm = null;
 
+/**
+ * Fonction qui gère le changement de menu du panneau
+*/
 function toggleForm(formId) {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');

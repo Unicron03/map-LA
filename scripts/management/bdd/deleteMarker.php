@@ -2,11 +2,13 @@
 header('Content-Type: application/json');  // Retour JSON
 
 try {
+    // Connexion à la base de données
     $pdo = new PDO("mysql:host=localhost;dbname=map-LA", "root", "", [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);
 
+    // Récupération des données JSON
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (!isset($data['id']) || empty($data['id'])) {
@@ -16,6 +18,7 @@ try {
 
     $id = $data['id'];
 
+    // Préparer et exécuter la requête
     $stmt = $pdo->prepare("DELETE FROM marker WHERE id = :id");
     if ($stmt->execute([':id' => $id])) {
         echo json_encode(['success' => true]);

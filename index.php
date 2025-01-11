@@ -37,8 +37,12 @@ include 'scripts/markerManagement.php';
         <title>Link's Awakening Interactive Map</title>
         <link rel="icon" href="img/icon.png" type="image/png">
 
+        <!-- Import css -->
         <link rel="stylesheet" href="css/leaflet.css"/>
-        <link rel="stylesheet" href="css/index.css?v=2.3"/>
+        <link rel="stylesheet" href="css/index.css?v=2.4"/>
+        <link rel="stylesheet" href="css/panel.css?v=2.4"/>
+        <link rel="stylesheet" href="css/formMarker.css?v=2.4"/>
+        <link rel="stylesheet" href="css/popupMarker.css?v=2.4"/>
     </head>
     <body>
         <!-- ------------------------------------------Le Panel------------------------------------------ -->
@@ -68,38 +72,40 @@ include 'scripts/markerManagement.php';
             <div id="change">
                 <!-- ------------------------------Section filtres------------------------------ -->
                 <div class="panel-controls" id="panel-controls">
-                    <!-- ---------------------------Formulaire affichage/désaffichage complétés--------------------------- -->
-                    <form class="form-marker" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
-                        <input type="hidden" name="param" value="complete">
-                        <button type="submit">
-                            <?php if ($_SESSION['complete'] == true): ?>
-                                Show Completed
-                            <?php else: ?>
-                                Hide Completed
-                            <?php endif; ?>
-                        </button>
-                    </form>
+                    <?php if (isLoggedIn()): ?>
+                        <!-- ---------------------------Formulaire affichage/désaffichage complétés--------------------------- -->
+                        <form class="form-filter" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
+                            <input type="hidden" name="param" value="complete">
+                            <button type="submit">
+                                <?php if ($_SESSION['complete'] == true): ?>
+                                    Show Completed
+                                <?php else: ?>
+                                    Hide Completed
+                                <?php endif; ?>
+                            </button>
+                        </form>
 
-                    <!-- ---------------------------Formulaire affichage/désaffichage favoris--------------------------- -->
-                    <form class="form-marker" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
-                        <input type="hidden" name="param" value="favorite">
-                        <button type="submit">
-                            <?php if ($_SESSION['favorite'] == true): ?>
-                                Show Favorites
-                            <?php else: ?>
-                                Hide Favorites
-                            <?php endif; ?>
-                        </button>
-                    </form>
+                        <!-- ---------------------------Formulaire affichage/désaffichage favoris--------------------------- -->
+                        <form class="form-filter" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
+                            <input type="hidden" name="param" value="favorite">
+                            <button type="submit">
+                                <?php if ($_SESSION['favorite'] == true): ?>
+                                    Show Favorites
+                                <?php else: ?>
+                                    Hide Favorites
+                                <?php endif; ?>
+                            </button>
+                        </form>
+                    <?php endif; ?>
 
                     <!-- ----------------------------Formulaire Sélection/Déseléction tt catégories---------------------------- -->
-                    <form class="form-marker" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
+                    <form class="form-filter" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
                         <input type="hidden" name="param" value="none">
                         <button type="submit">
                             Deselect All Categories
                         </button>
                     </form>
-                    <form class="form-marker" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
+                    <form class="form-filter" method="post" action="<?php echo $_SERVER['PHP_SELF'];?>" style="width: -webkit-fill-available; margin: 0;">
                         <input type="hidden" name="param" value="all">
                         <button type="submit">
                             Select All Categories
@@ -164,7 +170,7 @@ include 'scripts/markerManagement.php';
             });
 
             // Ajout de la couche de tuiles
-            L.tileLayer("http://localhost:8000/mapBoard/{z}/{x}/{y}.png", {
+            L.tileLayer("https://unicron03.github.io/map-LA/mapBoard/{z}/{x}/{y}.png", {
                 attribution: "",
                 minZoom: 0,
                 maxZoom: 4,
@@ -179,7 +185,7 @@ include 'scripts/markerManagement.php';
             var northEast = L.latLng(70.5, 180);   // Coin en haut à droite
             var bounds = L.latLngBounds(southWest, northEast);
 
-            // Gestion des clics droits
+            // Gestion des clics droits pour l'ajout de marker perso si connecté
             map.on('contextmenu', function(e) {
                 <?php if (!isLoggedIn()): ?>
                     alert("To create personalised markers you need to log in!");
@@ -205,6 +211,7 @@ include 'scripts/markerManagement.php';
                 }
             });
 
+            // Ouvre le formulaire de modification d'un marker perso
             function openEditForm(titre, description, x, y, id, buttonElement) {
                 var editFormContent = `
                     <form class="form-marker" onsubmit="updateMarker(event, ${id}, this);">
@@ -218,11 +225,12 @@ include 'scripts/markerManagement.php';
                 `;
 
                 L.popup()
-                    .setLatLng([-y+11.3, x])
+                    .setLatLng([-y, x])
                     .setContent(editFormContent)
                     .openOn(map);
             }
 
+            // Permet l'ajout visuel de marker sur la map
             function addMarkersToMap(x, y, titre, iconUrl, popupContent) {
                 // y+1 sur la SQL par rapport au local
                 L.marker([-y, x], { icon: iconUrl, title: titre, riseOnHover: true })
@@ -304,6 +312,7 @@ include 'scripts/markerManagement.php';
                 }
             }
 
+            // On affiche toutes les catégories séléctionner
             foreach ($_SESSION['categories'] as $category) {
                 renderMarkers(htmlspecialchars($category), $_SESSION['complete'], $_SESSION['favorite']);
             }

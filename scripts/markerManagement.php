@@ -3,6 +3,9 @@ require_once 'scripts/drawMarkers.php';
 ?>
 
 <script>
+    /**
+     * Fonction formatant les données d'un nouveau marker pour validation et envoi
+    */
     function createMarker(event, x, y, form) {
         event.preventDefault();  // Empêche le rechargement de la page
 
@@ -28,6 +31,9 @@ require_once 'scripts/drawMarkers.php';
         .catch(error => console.error('Erreur:', error));
     }
 
+    /**
+     * Fonction formatant les données d'un marker à suprimer pour validation et envoi
+    */
     function deleteMarker(event, id) {
         event.preventDefault();  // Empêche le rechargement de la page
 
@@ -49,6 +55,9 @@ require_once 'scripts/drawMarkers.php';
         .catch(error => console.error('Erreur:', error));
     }
 
+    /**
+     * Fonction formatant les données d'un marker existant à mettre à jour pour validation et envoi 
+    */
     function updateMarker(event, id, form) {
         event.preventDefault();  // Empêche le rechargement de la page
 
@@ -73,6 +82,9 @@ require_once 'scripts/drawMarkers.php';
         .catch(error => console.error('Erreur:', error));
     }
 
+    /**
+     * Fonction formatant les données d'un marker à marquer comme favoris pour validation et envoi 
+    */
     function markAsFavorite(event, id) {
         event.preventDefault(); // Empêche le rechargement de la page
 
@@ -88,6 +100,9 @@ require_once 'scripts/drawMarkers.php';
         .catch(error => console.error('Erreur:', error));
     }
 
+    /**
+     * Fonction formatant les données d'un marker à marquer comme complété pour validation et envoi 
+    */
     function markAsComplete(event, id) {
         event.preventDefault();  // Empêche le rechargement de la page
 

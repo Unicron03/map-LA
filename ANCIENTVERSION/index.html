@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html style="background-color: rgb(255, 255, 255);">
+    <head>
+        <title>Map Link's Awakening</title>
+        <link rel="stylesheet" href="css/index.css">
+    </head>
+
+    <body>
+        <div class="panel">
+            <div class="panel-flag">
+                <img src="img/icon-silhuet.png" alt="icon-silhuet"/>
+                <button onclick="adjustPanelHeight()" style="background: none; border: none; position: absolute; right: 0;">
+                    <img src="img/icon-reduce.png" alt="icon-reduce"/>
+                </button>
+
+                <h2 class="subtitle">Zelda: Link's Awakening Interactive Map</h2>
+            </div>
+
+            <div class="panel-controls">
+                <br><a>Cacher les points marqués</a>
+                <br><a onclick="disableAllMarkers()">Déselectionner toutes les catégories</a>
+                <br><a onclick="enableAllMarkers()">Sélectionner toutes les catégories</a>
+            </div>
+
+            <div class="panel-icons" id="panelIcons">
+            </div>
+        </div>
+
+        <div class="map-container" id="mapContainer">
+            <img class="map-part" id="tileExample" src="img/tilesZelda/1_1.png" alt="1_1">
+            <img class="map-part" src="img/tilesZelda/1_2.png" alt="1_2">
+            <img class="map-part" src="img/tilesZelda/1_3.png" alt="1_3">
+            <img class="map-part" src="img/tilesZelda/1_4.png" alt="1_4">
+            <img class="map-part" src="img/tilesZelda/2_1.png" alt="2_1">
+            <img class="map-part" src="img/tilesZelda/2_2.png" alt="2_2">
+            <img class="map-part" src="img/tilesZelda/2_3.png" alt="2_3">
+            <img class="map-part" src="img/tilesZelda/2_4.png" alt="2_4">
+            <img class="map-part" src="img/tilesZelda/3_1.png" alt="3_1">
+            <img class="map-part" src="img/tilesZelda/3_2.png" alt="3_2">
+            <img class="map-part" src="img/tilesZelda/3_3.png" alt="3_3">
+            <img class="map-part" src="img/tilesZelda/3_4.png" alt="3_4">
+            <img class="map-part" src="img/tilesZelda/4_1.png" alt="4_1">
+            <img class="map-part" src="img/tilesZelda/4_2.png" alt="4_2">
+            <img class="map-part" src="img/tilesZelda/4_3.png" alt="4_3">
+            <img class="map-part" src="img/tilesZelda/4_4.png" alt="4_4">
+        </div>
+
+        <div class="capsule-zoom">
+            <a href="#" role="button" onclick="zoomCenter(0.7)" title="Zoom in" style="border-radius: 16px 16px 0 0; border-bottom: 2px solid rgba(255, 255, 255, .2);"><span aria-label="false">+</span></a>
+            <a href="#" role="button" onclick="zoomCenter(-0.7)" title="Zoom out" style="border-radius: 0 0 16px 16px;"><span aria-label="false">-</span></a>
+        </div>
+    </body>
+    
+    <script>
+        const mapContainer = document.getElementById('mapContainer');
+        const panelIcons = document.getElementById('panelIcons');
+        const tileExample = document.getElementById('tileExample');
+        const markersLib = {
+            POI: {name: "POI", icon: "img/markers/locations.png", nbTotal: 0, nbCompleted: 0},
+            CrackedWalls: {name: "Cracked Wall", cat: "POI", icon: "img/markers/crackedwall.png", nbTotal: 0, nbCompleted: 0},
+            TradingSequence: {name: "Trading Sequence", cat: "POI", icon: "img/markers/trade.png", nbTotal: 0, nbCompleted: 0},
+            Minigame: {name: "Minigame", cat: "POI", icon: "img/markers/minigame.png", nbTotal: 0, nbCompleted: 0},
+            Items: {name: "Items", icon: "img/markers/items.png", nbTotal: 0, nbCompleted: 0},
+            POHeart: {name: "Pieces of Heart", cat: "Items", icon: "img/markers/heart.png", nbTotal: 0, nbCompleted: 0},
+            Seashells: {name: "Seashells", cat: "Items", icon: "img/markers/seashell.png", nbTotal: 0, nbCompleted: 0},
+            Bottles: {name: "Bottles", cat: "Items", icon: "img/markers/bottle.png", nbTotal: 0, nbCompleted: 0},
+            Locations: {name: "Locations", icon: "img/markers/locations.png", nbTotal: 0, nbCompleted: 0},
+            Houses: {name: "Houses", cat: "Locations", icon: "img/markers/house.png", nbTotal: 0, nbCompleted: 0},
+            Shops: {name: "Shops", cat: "Locations", icon: "img/markers/shop.png", nbTotal: 0, nbCompleted: 0},
+            Dungeons: {name: "Dungeons", cat: "Locations", icon: "img/markers/dungeon.png", nbTotal: 0, nbCompleted: 0},
+            FFountains: {name: "Fairy Fountains", cat: "Locations", icon: "img/markers/fairy.png", nbTotal: 0, nbCompleted: 0},
+            Enemies: {name: "Enemies", icon: "img/markers/enemies.png", nbTotal: 0, nbCompleted: 0},
+            Boss: {name: "Boss", cat: "Enemies", icon: "img/markers/boss.png", nbTotal: 0, nbCompleted: 0},
+        };
+
+        function displayIcons(markers) {
+            for (const key in markers) {
+                if (markers.hasOwnProperty(key)) {
+                    const marker = markers[key];
+                    if (marker.cat && markers[marker.cat]) {
+                        displayIcons({ [marker.cat]: markers[marker.cat] });
+                    }
+                }
+            }
+        }
+
+        displayIcons(markersLib);
+        const markers = [
+            { element: "Wind Fish's Egg", initialX: 423, initialY: 240, cat: markersLib.Dungeons },
+            { element: "Piece of Heart", initialX: 51, initialY: 255, cat: markersLib.POHeart },
+            { element: "Turtle Rock", initialX: 49, initialY: 293, cat: markersLib.Dungeons },
+            { element: "Turtle Rock", initialX: 49, initialY: 305, cat: markersLib.Boss },
+            { element: "Secret Seashells", initialX: 191, initialY: 300, cat: markersLib.Seashells },
+            { element: "Cracked Wall", initialX: 236, initialY: 308, cat: markersLib.CrackedWalls },
+            { element: "Secret Seashells", initialX: 369, initialY: 282, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 473, initialY: 282, cat: markersLib.POHeart },
+            { element: "Piece of Heart", initialX: 473, initialY: 310, cat: markersLib.POHeart },
+            { element: "Hibiscus", initialX: 616, initialY: 305, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 631, initialY: 282, cat: markersLib.Seashells },
+            { element: "Hen House", initialX: 665, initialY: 258, cat: markersLib.Houses },
+            { element: "Secret Seashells", initialX: 811, initialY: 272, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 856, initialY: 314, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 911, initialY: 276, cat: markersLib.Seashells },
+            { element: "Eagle's Tower", initialX: 920, initialY: 279, cat: markersLib.Dungeons },
+            { element: "Cracked Walls", initialX: 971, initialY: 318, cat: markersLib.CrackedWalls },
+            { element: "Raft Rapids", initialX: 963, initialY: 370, cat: markersLib.Minigame },
+            { element: "Piece of Heart", initialX: 958, initialY: 373, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 968, initialY: 373, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 919, initialY: 355, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 826, initialY: 362, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 802, initialY: 330, cat: markersLib.Seashells },
+            { element: "Angler's Tunnel", initialX: 727, initialY: 357, cat: markersLib.Dungeons },
+            { element: "Piece of Heart", initialX: 472, initialY: 365, cat: markersLib.POHeart },
+            { element: "Piece of Heart", initialX: 485, initialY: 365, cat: markersLib.POHeart },
+            { element: "Heart Container", initialX: 479, initialY: 370, cat: markersLib.POHeart },
+            { element: "Bottle", initialX: 472, initialY: 375, cat: markersLib.Bottles },
+            { element: "Secret Seashells", initialX: 485, initialY: 375, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 361, initialY: 345, cat: markersLib.Seashells },
+            { element: "Bottle Grotto", initialX: 287, initialY: 350, cat: markersLib.Dungeons },
+            { element: "Chamber Dungeon", initialX: 479, initialY: 382, cat: markersLib.Dungeons },
+            { element: "Piece of Heart", initialX: 163, initialY: 408, cat: markersLib.POHeart },
+            { element: "Piece of Heart", initialX: 126, initialY: 333, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 126, initialY: 360, cat: markersLib.Seashells },
+            { element: "Broom", initialX: 64, initialY: 367, cat: markersLib.TradingSequence },
+            { element: "Mr. Write's House", initialX: 64, initialY: 378, cat: markersLib.Houses },
+            { element: "Secret Seashells", initialX: 46, initialY: 402, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 169, initialY: 445, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 187, initialY: 465, cat: markersLib.POHeart },
+            { element: "Fairy Fountain", initialX: 234, initialY: 444, cat: markersLib.FFountains },
+            { element: "Piece of Heart", initialX: 293, initialY: 415, cat: markersLib.POHeart },
+            { element: "Bottle", initialX: 281, initialY: 480, cat: markersLib.Bottles },
+            { element: "Secret Seashells", initialX: 306, initialY: 504, cat: markersLib.Seashells },
+            { element: "Witch's Hut", initialX: 355, initialY: 450, cat: markersLib.Shops },
+            { element: "Crazy Tracy's Health Spa", initialX: 380, initialY: 404, cat: markersLib.Shops },
+            { element: "Piece of Heart", initialX: 480, initialY: 407, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 495, initialY: 433, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 547, initialY: 407, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 429, initialY: 497, cat: markersLib.POHeart },
+            { element: "Color Dungeon", initialX: 499, initialY: 491, cat: markersLib.Dungeons },
+            { element: "Canalet Castle", initialX: 609, initialY: 491, cat: markersLib.Dungeons },
+            { element: "Secret Seashells", initialX: 782, initialY: 477, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 792, initialY: 443, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 907, initialY: 454, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 943, initialY: 537, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 956, initialY: 553, cat: markersLib.Seashells },
+            { element: "Cracked Wall", initialX: 849, initialY: 540, cat: markersLib.CrackedWalls },
+            { element: "Fairy Fountain", initialX: 849, initialY: 533, cat: markersLib.FFountains },
+            { element: "Secret Seashells", initialX: 906, initialY: 605, cat: markersLib.Seashells },
+            { element: "Armos Knight", initialX: 796, initialY: 598, cat: markersLib.Boss },
+            { element: "North Face Shrine", initialX: 783, initialY: 537, cat: markersLib.Dungeons },
+            { element: "Stick", initialX: 727, initialY: 524, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 724, initialY: 545, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 664, initialY: 535, cat: markersLib.POHeart },
+            { element: "Piece of Heart", initialX: 689, initialY: 606, cat: markersLib.POHeart },
+            { element: "Piece of Heart", initialX: 576, initialY: 522, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 603, initialY: 630, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 537, initialY: 603, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 485, initialY: 569, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 429, initialY: 595, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 485, initialY: 640, cat: markersLib.POHeart },
+            { element: "Honeycomb", initialX: 482, initialY: 537, cat: markersLib.TradingSequence },
+            { element: "Cracked Wall", initialX: 467, initialY: 528, cat: markersLib.CrackedWalls },
+            { element: "Fairy Fountain", initialX: 467, initialY: 520, cat: markersLib.FFountains },
+            { element: "Richard's Villa", initialX: 417, initialY: 688, cat: markersLib.Houses },
+            { element: "Secret Seashells", initialX: 411, initialY: 687, cat: markersLib.Seashells },
+            { element: "Key Cavern", initialX: 367, initialY: 619, cat: markersLib.Dungeons },
+            { element: "Secret Sashells", initialX: 361, initialY: 592, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 403, initialY: 539, cat: markersLib.POHeart },
+            { element: "Cracked Wall", initialX: 401, initialY: 539, cat: markersLib.CrackedWalls },
+            { element: "Piece of Heart", initialX: 324, initialY: 546, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 309, initialY: 595, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 244, initialY: 591, cat: markersLib.Seashells },
+            { element: "Trendy Game", initialX: 238, initialY: 628, cat: markersLib.Minigame },
+            { element: "Yoshi Doll", initialX: 234, initialY: 622, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 235, initialY: 617, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 238, initialY: 619, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 244, initialY: 622, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 242, initialY: 614, cat: markersLib.POHeart },
+            { element: "Mabe Village Shop", initialX: 231, initialY: 572, cat: markersLib.Shops },
+            { element: "Piece of Heart", initialX: 235, initialY: 566, cat: markersLib.POHeart },
+            { element: "Marins and Tarin's House", initialX: 176, initialY: 597, cat: markersLib.Houses },
+            { element: "Papahl, Mamasha, and the Quadruplet's House", initialX: 182, initialY: 521, cat: markersLib.Houses },
+            { element: "Ribbon", initialX: 177, initialY: 524, cat: markersLib.TradingSequence },
+            { element: "Fishing", initialX: 121, initialY: 533, cat: markersLib.Minigame },
+            { element: "Secret Seashells", initialX: 104, initialY: 526, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 105, initialY: 530, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 107, initialY: 536, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 93, initialY: 530, cat: markersLib.POHeart },
+            { element: "Bottle", initialX: 92, initialY: 535, cat: markersLib.Bottles },
+            { element: "Secret Seashells", initialX: 105, initialY: 507, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 52, initialY: 601, cat: markersLib.POHeart },
+            { element: "Madam MeowMeow's House", initialX: 103, initialY: 588, cat: markersLib.Houses },
+            { element: "Dog Food", initialX: 117, initialY: 593, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 119, initialY: 595, cat: markersLib.Seashells },
+            { element: "Grandpa Ulrira and Grandma Yahoo's House", initialX: 108, initialY: 618, cat: markersLib.Houses },
+            { element: "Fishing Hook", initialX: 121, initialY: 628, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 168, initialY: 694, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 80, initialY: 735, cat: markersLib.Seashells },
+            { element: "Cracked Wall", initialX: 269, initialY: 750, cat: markersLib.CrackedWalls },
+            { element: "Tail Cave", initialX: 244, initialY: 682, cat: markersLib.Dungeons },
+            { element: "Secret Seashells", initialX: 238, initialY: 680, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 330, initialY: 762, cat: markersLib.Seashells },
+            { element: "Ghost's House", initialX: 429, initialY: 736, cat: markersLib.Houses },
+            { element: "Secret Seashells", initialX: 436, initialY: 746, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 541, initialY: 747, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 590, initialY: 729, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 621, initialY: 752, cat: markersLib.POHeart },
+            { element: "Piece of Heart", initialX: 614, initialY: 732, cat: markersLib.POHeart },
+            { element: "Magnifying Lens", initialX: 615, initialY: 715, cat: markersLib.TradingSequence },
+            { element: "Catfish's Maw", initialX: 609, initialY: 694, cat: markersLib.Dungeons },
+            { element: "Scale", initialX: 609, initialY: 671, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 660, initialY: 689, cat: markersLib.Seashells },
+            { element: "Necklace", initialX: 682, initialY: 715, cat: markersLib.TradingSequence },
+            { element: "Secret Seashells", initialX: 532, initialY: 530, cat: markersLib.Seashells },
+            { element: "Bananas", initialX: 232, initialY: 711, cat: markersLib.TradingSequence },
+            { element: "Sales House O' Bananas", initialX: 237, initialY: 713, cat: markersLib.Houses },
+            { element: "Piece of Heart", initialX: 765, initialY: 654, cat: markersLib.POHeart },
+            { element: "Secret Seashells", initialX: 876, initialY: 746, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 981, initialY: 743, cat: markersLib.Seashells },
+            { element: "Secret Seashells", initialX: 968, initialY: 658, cat: markersLib.Seashells },
+            { element: "Piece of Heart", initialX: 916, initialY: 652, cat: markersLib.POHeart },
+            { element: "Lanmolas", initialX: 916, initialY: 659, cat: markersLib.Boss },
+            { element: "Piece of Heart", initialX: 874, initialY: 650, cat: markersLib.POHeart },
+            { element: "Cracked Wall", initialX: 874, initialY: 654, cat: markersLib.CrackedWalls },
+            { element: "Secret Seashells", initialX: 862, initialY: 654, cat: markersLib.Seashells },
+            { element: "Letter", initialX: 838, initialY: 653, cat: markersLib.TradingSequence },
+            { element: "Christine's House", initialX: 838, initialY: 656, cat: markersLib.Houses },
+            { element: "Secret Seashells", initialX: 840, initialY: 658, cat: markersLib.Seashells },
+            { element: "Pineaple", initialX: 862, initialY: 679, cat: markersLib.TradingSequence },
+            { element: "Chef Bear's House", initialX: 857, initialY: 680, cat: markersLib.Houses }
+        ];
+        const tilesZelda = [];
+        mapContainer.querySelectorAll('*').forEach(element => {
+            tilesZelda.push(element);
+        });
+        let iconPanelToDraw = [];
+
+        function getNbMarkerCompleted(cat) {
+            return "0 / " + cat.nbTotal;
+        }
+
+        function disableAllMarkers() {
+            document.querySelectorAll('.icon-panel').forEach(function(element) {
+                element.style.filter = "brightness(50%)";
+            });
+
+            markers.forEach(marker => {
+                marker.element.style.display = "none";
+            });
+        }
+
+        function enableAllMarkers() {
+            document.querySelectorAll('.icon-panel').forEach(function(element) {
+                element.style.filter = "brightness(100%)";
+            });
+
+            markers.forEach(marker => {
+                marker.element.style.display = "block";
+            });
+        }
+
+        function displayMarkers(selectedMarker, aElement) {
+            // console.log(window.getComputedStyle(aElement).getPropertyValue('filter').match(/brightness\(([^)]+)\)/)[1]);
+            if (selectedMarker.cat == undefined) {
+                document.querySelectorAll('.icon-panel').forEach(function(element) {
+                    if (element.querySelector('img').alt != selectedMarker.name) element.style.filter = "brightness(50%)";
+                    else {
+                        if (window.getComputedStyle(aElement).getPropertyValue('filter').match(/brightness\(([^)]+)\)/)[1] == 1) {
+                            element.style.filter = "brightness(50%)";
+                        } else {
+                            element.style.filter = "brightness(100%)";
+                        }
+                    }
+                });
+                aElement.style.filter = "brightness(100%)";
+
+                // markers.forEach(marker => {
+                //     let markerIcon;
+                //     document.querySelectorAll('.icon-panel').forEach(function(element) {
+                //         if (!iconPanelToDraw.includes(element.querySelector('p.label').textContent)) element.style.filter = "brightness(50%)";
+                //     });
+                //     if (marker.cat.name == selectedMarker.cat) displayMarkers(marker, marker.element);
+                // });
+            } else {
+                document.querySelectorAll('.icon-panel').forEach(function(element) {
+                    if (!iconPanelToDraw.includes(element.querySelector('p.label').textContent)) element.style.filter = "brightness(50%)";
+                });
+                
+                const index = iconPanelToDraw.indexOf(selectedMarker.name);
+                if (index > -1) {
+                    iconPanelToDraw.splice(index, 1);
+                } else {
+                    iconPanelToDraw.push(selectedMarker.name);
+                    aElement.style.filter = "brightness(100%)";
+                }
+
+                markers.forEach(marker => {
+                    marker.element.style.display = "none";
+                });
+
+                markers.forEach(marker => {
+                    if (iconPanelToDraw.includes(marker.cat.name)) {
+                        marker.element.style.display = "block";
+                    }
+                });
+            }
+        }
+
+        function initPanelIcons() {
+            Object.values(markersLib).forEach(marker => {
+                const aElement = document.createElement('a');
+                aElement.className = 'icon-panel';
+
+                const imgElement = document.createElement('img');
+                imgElement.src = marker.icon;
+                imgElement.alt = marker.cat;
+
+                const pElement = document.createElement('p');
+                pElement.className = 'label';
+                pElement.textContent = marker.name;
+
+                aElement.appendChild(imgElement);
+                aElement.appendChild(pElement);
+
+                aElement.addEventListener("mouseover", () => {
+                    pElement.textContent = getNbMarkerCompleted(marker);
+                    // pElement.style.display = "block";
+                })
+                aElement.addEventListener("mouseout", () => {
+                    pElement.textContent = marker.name;
+                    // pElement.style.display = "table-caption";
+                })
+                aElement.onclick = () => displayMarkers(marker, aElement);
+                document.getElementById('panelIcons').appendChild(aElement);
+            });
+        }
+
+        function addMarkers() {
+            markers.forEach(marker => {
+                const markerElement = document.createElement('img');
+                markerElement.src = marker.cat.icon;
+                markerElement.alt = marker.element;
+                markerElement.className = 'marker';
+                markerElement.id = marker.element;
+                markerElement.title = marker.element;
+                markerElement.onclick = () => SelectMarker(markerElement);
+                markerElement.addEventListener("mouseover", () => { markerElement.style.cursor = 'pointer'; });
+
+                mapContainer.appendChild(markerElement);
+
+                marker.element = markerElement;
+
+                marker.cat.nbTotal += 1;
+
+                let parentCat = marker.cat;
+                while (parentCat.cat) {
+                    parentCat = markersLib[parentCat.cat];
+                    parentCat.nbTotal += 1;
+                }
+            });
+        }
+
+        function SelectMarker(markerElement) {
+            const markerId = markerElement.id;
+            console.log("Marker ID:", markerId);
+        }
+
+        function adjustPanelHeight() {
+            if (document.querySelector('.panel-icons').style.display == 'none') {
+                document.querySelector('.panel-icons').style.display = 'inline-grid';
+            } else {
+                document.querySelector('.panel-icons').style.display = 'none';
+            }
+        }
+
+        let scale = 1;
+        const scaleStep = 0.3;
+        const maxScale = 3.5;
+        const minScale = 0.5;
+        let isDragging = false;
+        let startX, startY;
+        let translateX = 0, translateY = 0;
+
+        function updateMarkers() {
+            markers.forEach(marker => {
+                marker.element.style.transform = `translate(${marker.initialX}px, ${marker.initialY}px) scale(${1/scale})`;
+            });
+        }
+
+        function downscaleTiles() {
+            tilesZelda.forEach(tile => {
+                tile.src = "img/tilesZelda/" + tile.alt + ".png";
+            });
+        }
+        function upscaleTiles() {
+            tilesZelda.forEach(tile => {
+                tile.src = "img/tilesZelda/upgraded/" + tile.alt + ".png";
+            });
+        }
+
+        function zoomCenter(scaleStep) {
+            mapContainer.style.transition = 'transform 0.2s ease';
+
+            const rect = document.body.getBoundingClientRect();
+            const centerX = rect.width / 2 - mapContainer.clientWidth / 2;
+            const centerY = rect.height / 2 - mapContainer.clientHeight / 2;
+
+            const prevScale = scale;
+            if (scaleStep < 0) {
+                scale = Math.max(scale + scaleStep, minScale);
+            } else {
+                scale = Math.min(scale + scaleStep, maxScale);
+            }
+            const scaleRatio = scale / prevScale;
+
+            translateX = centerX - (centerX - translateX) * scaleRatio;
+            translateY = centerY - (centerY - translateY) * scaleRatio;
+
+            mapContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+
+            updateMarkers();
+        }
+
+        function zoom(event) {
+            mapContainer.style.transition = 'transform 0.2s ease';
+
+            // event.preventDefault();
+
+            const rect = mapContainer.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            const prevScale = scale;
+
+            if (event.deltaY < 0) {
+                scale = Math.min(scale + scaleStep, maxScale);
+            } else {
+                scale = Math.max(scale - scaleStep, minScale);
+            }
+
+            const scaleRatio = scale / prevScale;
+
+            // Ajuster la translation pour garder le point sous la souris
+            const offset = scale == maxScale || scale == minScale ? 0 : event.deltaY < 0 ? 157 : -157;
+            translateX = mouseX - (mouseX - translateX) * scaleRatio + offset;
+            translateY = mouseY - (mouseY - translateY) * scaleRatio + offset;
+
+            mapContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+
+            updateMarkers(); // Repositionner les markers après le zoom
+
+            if (scale == maxScale) upscaleTiles();
+            else if (prevScale == maxScale) downscaleTiles();
+        }
+
+        function startDrag(event) {
+            isDragging = true;
+            startX = event.clientX;
+            startY = event.clientY;
+        }
+
+        function drag(event) {
+            mapContainer.style.transition = 'transform 0s ease';
+
+            if (isDragging) {
+                const currentX = event.clientX;
+                const currentY = event.clientY;
+
+                const deltaX = currentX - startX;
+                const deltaY = currentY - startY;
+
+                translateX += deltaX;
+                translateY += deltaY;
+
+                mapContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+
+                updateMarkers(); // Repositionner les markers après le déplacement
+
+                startX = currentX;
+                startY = currentY;
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+        }
+
+        mapContainer.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+        document.body.addEventListener('wheel', zoom);
+
+        addMarkers();
+        updateMarkers();
+        initPanelIcons();
+    </script>
+</html>
