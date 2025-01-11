@@ -60,8 +60,8 @@ include 'scripts/markerManagement.php';
                     </button>
 
                     <!-- --------------Bouton info (affiche le document de fonctionnement)-------------- -->
-                    <button onclick="location.href='https://unicron03.github.io/map-LA/'">
-                        <img id="icon-info" src="img/icon-info.png" alt="icon-info" title="Go to documentation"/>
+                    <button onclick="window.open('https://unicron03.github.io/map-LA/#fonctionnement', '_blank')">
+                        <img id="icon-info" src="img/icon-info.png" alt="icon-info" title="Go to documentation" />
                     </button>
                     
                     <!-- -----------------------Bouton Minimiser (Cacher 'change')----------------------- -->
