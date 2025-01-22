@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-// Variable de stockage
-if (!isset($_SESSION['categories'])) {
-    $_SESSION['categories'] = [];
-}
+$_SESSION["pdoUserName"] = "root";
+$_SESSION["pdoUserPassword"] = "";
+
+// Initialisation des variables de session
 if (!isset($_SESSION['categoriesAll'])) {
     $_SESSION['categoriesAll'] = [];
 }
@@ -20,22 +20,27 @@ function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-// Import scripts
+// Import des scripts
 include 'scripts/services/database.php';
 include 'scripts/getTypeMarkers.php';
 include 'scripts/management/account/inscription.php';
 include 'scripts/management/account/connexion.php';
 include 'scripts/management/account/deconnexion.php';
+include 'scripts/phpMailer.php';
 include 'scripts/drawMarkers.php';
 include 'scripts/loadCatMarkers.php';
 include 'scripts/markerManagement.php';
+
+if (!isset($_SESSION['categories'])) {
+    $_SESSION['categories'] = $_SESSION['categoriesAll'];
+}
 ?>
 
 <!DOCTYPE html>
 <html>
     <head>
         <title>Link's Awakening Interactive Map</title>
-        <link rel="icon" href="img/icon.png" type="image/png">
+        <link rel="icon" href="https://github.com/Unicron03/map-LA/blob/main/img/icon.png" type="image/png">
 
         <!-- Import css -->
         <link rel="stylesheet" href="css/leaflet.css"/>
@@ -130,7 +135,10 @@ include 'scripts/markerManagement.php';
                             <input id="passco" type="password" name="password" placeholder="Password" required>
                             <button type="submit" id="btnconnect" name="login">Login</button>
                         </form>
-                        <button id="register-button" onclick="toggleForm('register-form')">Register</button>
+                        <div class="login-form-buttons">
+                            <button onclick="toggleForm('register-form')">Register</button>
+                            <button onclick="toggleForm('changePass-form')">Change password</button>
+                        </div>
                     <?php else: ?>
                         <h2>Don't leave us! We love cats!</h2>
                         <div class="panel-controls">
@@ -143,11 +151,20 @@ include 'scripts/markerManagement.php';
                 <div id="register-form" class="form-container">
                     <h2>It's dangerous to go alone! We're glad you're here with us.</h2>
                     <form id="forminsc" method="POST">
-                        <input id="usere" type="text" name="username" placeholder="Nom d'utilisateur" required>
+                        <input id="usere" type="text" name="username" placeholder="Username" required>
                         <input id="passre" type="password" name="password" placeholder="Password" required>
-                        <input id="fullre" type="text" name="fullname" placeholder="Nom complet" required>
+                        <input id="fullre" type="text" name="fullname" placeholder="Full name" required>
                         <input id="emailre" type="email" name="email" placeholder="Email" required>
-                        <button id="registerbtn" type="submit" name="register">S'inscrire</button>
+                        <button id="registerbtn" type="submit" name="register">Register</button>
+                    </form>
+                </div>
+
+                <!-- -----------------Formulaire changer mot de passe------------------------------------------------------------------------ -->
+                <div id="changePass-form" class="form-container">
+                    <h2>An email will be share at your adress</h2>
+                    <form id="formconnex" method="POST">
+                        <input id="emailchange" type="email" name="email" placeholder="Email" required>
+                        <button id="btnconnect" type="submit" name="change">Share</button>
                     </form>
                 </div>
             </div>
@@ -166,7 +183,6 @@ include 'scripts/markerManagement.php';
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
         <script>
-            var Perso = L.icon({iconUrl: 'img/markers/perso.png', iconSize: [32, 32]});
             let selectedCategories = [];
 
             var map = L.map('map', {
@@ -247,7 +263,7 @@ include 'scripts/markerManagement.php';
         <script>
             // Fonction pour ajuster la hauteur du panel
             function adjustPanelHeight() {
-                if (document.getElementById('login-form').style.display == 'block') {
+                if (document.getElementById('panel-controls').style.display == 'none') {
                     return;
                 }
 
@@ -288,7 +304,7 @@ include 'scripts/markerManagement.php';
                     $_SESSION['favorite'] = true;
                 } else {
                     $parCat = isCatAGroup(Database::get(), $param);
-                    if (!$parCat[0]['subId']) {
+                    if ($param != "Favorites" && $param != "Completed" && !$parCat[0]['subId']) {
                         $markers = getTypeMarkersBySubID($parCat[0]['id']);
 
                         foreach ($markers as $marker) {
@@ -319,7 +335,11 @@ include 'scripts/markerManagement.php';
 
             // On affiche toutes les catégories séléctionner
             foreach ($_SESSION['categories'] as $category) {
-                renderMarkers(htmlspecialchars($category), $_SESSION['complete'], $_SESSION['favorite']);
+                if ($category == "Favorites" || $category == "Completed") {
+                    renderMarkers($category, true, true);
+                } else {
+                    renderMarkers(htmlspecialchars($category), $_SESSION['complete'], $_SESSION['favorite']);
+                }
             }
 
             loadCatMarkers();

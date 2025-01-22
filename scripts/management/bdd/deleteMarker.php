@@ -1,9 +1,10 @@
 <?php
 header('Content-Type: application/json');  // Retour JSON
+session_start();
 
 try {
     // Connexion à la base de données
-    $pdo = new PDO("mysql:host=localhost;dbname=map-LA", "root", "", [
+    $pdo = new PDO("mysql:host=localhost;dbname=map-LA", $_SESSION["pdoUserName"], $_SESSION["pdoUserPassword"], [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]);

@@ -1,9 +1,13 @@
 <?php
 
 /**
- * Renvoi l'id et le subId de la catégorie (pour évaluation si c'est un catégorie mère ou non)---
+ * Renvoi l'id et le subId de la catégorie (pour évaluation si c'est un catégorie mère ou non).
 */
 function isCatAGroup($pdo, $category) {
+    if ($category == "Favorites" || $category == "Completed") {
+        return false;
+    }
+
     $query = "
         SELECT id, subId
         FROM typemarker
@@ -22,7 +26,7 @@ function isCatAGroup($pdo, $category) {
 function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
     $parCat = isCatAGroup($pdo, $category);
 
-    // Requête SQL mise à jour pour inclure la table userdata
+    // Début de la requête SQL
     $query = "
         SELECT 
             m.id, m.x, m.y, m.titre, m.description, m.image, 
@@ -36,39 +40,42 @@ function fetchMarkers($pdo, $userId, $category, $complete, $favorite) {
         WHERE (m.userID = :userId OR m.userID IS NULL)
     ";
 
-    // Filtrer par catégorie (catégorie mère ou sous-catégorie)
-    if (!$parCat[0]['subId']) {
-        $query .= " AND t.subId = :id";
+    // Ajout de filtres selon la catégorie
+    if ($category == "Favorites") {
+        $query .= " AND COALESCE(u.favorite, m.favorite) = 1";
+    } elseif ($category == "Completed") {
+        $query .= " AND COALESCE(u.complete, m.complete) = 1";
     } else {
-        $query .= " AND t.nom LIKE :category";
+        if (!$parCat[0]['subId']) {
+            $query .= " AND t.subId = :id";
+        } else {
+            $query .= " AND t.nom LIKE :category";
+        }
     }
 
-    // Ajout des conditions de filtrage si nécessaire
+    // Ajout des filtres pour complete et favorite
     if ($complete == false) {
-        $query .= " AND COALESCE(u.complete, m.complete) = :complete";
+        $query .= " AND COALESCE(u.complete, m.complete) = 0";
     }
     if ($favorite == false) {
-        $query .= " AND COALESCE(u.favorite, m.favorite) = :favorite";
+        $query .= " AND COALESCE(u.favorite, m.favorite) = 0";
     }
 
     // Préparation de la requête
     $stmt = $pdo->prepare($query);
+
+    // Liaison des paramètres
     $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
 
-    if (!$parCat[0]['subId']) {
-        $stmt->bindValue(':id', $parCat[0]['id'], PDO::PARAM_STR);
-    } else {
-        $stmt->bindValue(':category', "%$category%", PDO::PARAM_STR);
+    if ($category != "Favorites" && $category != "Completed") {
+        if (!$parCat[0]['subId']) {
+            $stmt->bindValue(':id', $parCat[0]['id'], PDO::PARAM_INT);
+        } else {
+            $stmt->bindValue(':category', "%$category%", PDO::PARAM_STR);
+        }
     }
 
-    if ($complete == false) {
-        $stmt->bindValue(':complete', $complete, PDO::PARAM_STR);
-    }
-    if ($favorite == false) {
-        $stmt->bindValue(':favorite', $favorite, PDO::PARAM_STR);
-    }
-
-    // Exécution et récupération des résultats
+    // Exécution et retour des résultats
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

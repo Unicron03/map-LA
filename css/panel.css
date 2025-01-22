@@ -40,15 +40,18 @@
 }
 #login-form button { cursor: pointer; }
 
-#register-button {
+.login-form-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 10px;
+}
+.login-form-buttons button {
     color: rgb(24, 81, 165);
     border: none;
     background-color: rgba(0, 0, 0, 0);
-    margin-top: 10px;
-    margin-bottom: 20px;
 }
-
-#register-button:hover {
+.login-form-buttons button:hover {
     color: rgb(11, 63, 139);
     text-decoration: underline;
 }
@@ -79,7 +82,11 @@
     text-align: center;
     color: white;
     font-size: medium;
-    margin-bottom: 20px;
+}
+
+#changePass-form {
+    text-align: center;
+    margin: 10px;
 }
 
 /* ------------Menu filtre/catégories------------ */
